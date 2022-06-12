@@ -6,7 +6,6 @@
 
 This package is an attemptted implementation of Bayesian Additive Regression Trees (Chipman et al. 2010) with Hierarchical Shrinkage (Agrawal 2022). This package accounts for the Hierarchical Shrinkage aspect of models within MCMC (drawing parameters, calculating marginal likelihoods etc.), rather than applying shrinkage post-hoc as in Agrawal et al. (2022).
 
-Agarwal, A., Tan, Y. S., Ronen, O., Singh, C., & Yu, B. (2022). Hierarchical Shrinkage: improving the accuracy and interpretability of tree-based methods. arXiv preprint arXiv:2202.00858.
 
 [Agarwal, A., Tan, Y. S., Ronen, O., Singh, C., & Yu, B. (2022). _Hierarchical Shrinkage: improving the accuracy and interpretability of tree-based methods_ .](https://arxiv.org/abs/2202.00858)
 
@@ -14,7 +13,6 @@ Agarwal, A., Tan, Y. S., Ronen, O., Singh, C., & Yu, B. (2022). Hierarchical Shr
 
 ## Installation
 
-You can install the development version of HSBART like so:
 
 ``` r
 library(devtools)
@@ -24,7 +22,6 @@ install_github("EoghanONeill/HSBART")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(HSBART)
