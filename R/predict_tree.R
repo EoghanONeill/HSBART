@@ -1,4 +1,4 @@
-#' @export
+#' @export 
 predict_motr_bart = function(object, newdata,
                              type = c('all', 'median', 'mean')) {
   # Get the means and sds to standardise the covariates from the test data

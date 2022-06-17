@@ -69,15 +69,6 @@ parent_list = function(mtree, index){
 # The phi matrix function constructs based on the hierarchical shrinkage method, input: tree, data and information about the internals
 phi_matrix = function(mtree,int, x){
 
-  # print("mtree = ")
-  # print(mtree)
-  #
-  # print("int = ")
-  # print(int)
-  #
-  # print("x = ")
-  # print(x)
-
   n = nrow(x)
   phi_matrix = NULL
   if(!is.matrix(int)){
@@ -314,7 +305,7 @@ get_beta_hat = function(sim_beta){
 # The tau prior function calculates the prior probability for the bandwidth
 # This is relevant for the second Metropolis Hastings step, input; tau value and tau rate
 tau_prior= function(tau_value, tau_rate){
-  tau = pexp(tau_value,(1/tau_rate), lower.tail = FALSE)
+  tau = dexp(tau_value,tau_rate)
   return(tau)
 }
 
@@ -351,22 +342,24 @@ test_function = function(newdata,object){
   newdata = as.matrix(cbind(1,scale(newdata, center=center, scale=scale))) # standardize based on the centers and scales of the training data
   ntrees = object$ntrees
 
+  # print('newdata = ')
+  # print(newdata)
+
+
+
+
   # Create holder for predicted values
   n_its = object$npost
 
   # Initiliaze matrices to store the predictions for each observation and iteration
   preds = matrix(NA, nrow = nrow(newdata),
                  ncol = n_its)
-  # confs = matrix(NA, nrow = nrow(newdata),
-  #                ncol = n_its)
 
   # Now loop through iterations and get predictions
   for(i in 1:n_its) {
     pred = numeric(nrow(newdata))
-    # conf = numeric(nrow(newdata))
 
     for(j in 1:ntrees){
-
       # get the tree, beta vector and bandwidth of the soft motr object
       tree = object$trees[[i]][[j]]
       beta = object$beta_trees[[i]][[j]]
@@ -375,7 +368,7 @@ test_function = function(newdata,object){
       if(!is.null(int)){
 
         # phi_matrix = phi_matrix(tree,int,newdata)
-        # int_temp <- as.numeric(int)
+
         int_temp <- int
         if(!is.matrix(int_temp)){
           # print("int_temp = ")
@@ -402,39 +395,49 @@ test_function = function(newdata,object){
         #
 
 
-          phi_matrix = suppressWarnings(phi_app_hs(matrix(as.numeric(tree$tree_matrix),
-                                       nrow = nrow(tree$tree_matrix),
-                                       ncol = ncol(tree$tree_matrix)) ,
-                                matrix(as.numeric(tree$node_indices),
-                                       nrow = length(tree$node_indices),
-                                       ncol = 1)  ,
-                                matrix(as.numeric(int_temp),
-                                       nrow = nrow(int_temp),
-                                       ncol = ncol(int_temp)) ,
-                                as.matrix(newdata))
+        phi_matrix = suppressWarnings(phi_app_hs(matrix(as.numeric(tree$tree_matrix),
+                                                        nrow = nrow(tree$tree_matrix),
+                                                        ncol = ncol(tree$tree_matrix)) ,
+                                                 matrix(as.numeric(tree$node_indices),
+                                                        nrow = length(tree$node_indices),
+                                                        ncol = 1)  ,
+                                                 matrix(as.numeric(int_temp),
+                                                        nrow = nrow(int_temp),
+                                                        ncol = ncol(int_temp)) ,
+                                                 as.matrix(newdata))
         )
+
 
         design = design_matrix(tree,newdata,phi_matrix,int)
 
+        # print('phi_matrix = ')
+        # print(phi_matrix)
+        #
+        # print('design = ')
+        # print(design)
+        #
+        # print('phi_matrix == design')
+        # print(phi_matrix == design)
+
+        # print('newdata = ')
+        # print(newdata)
+
+
         # calculate the model fit
         pred = pred + (design %*% beta)
-        # conf = conf + design %*% beta  + rnorm(1,0, sqrt(object$sigma2[[j]])) # add a sample for the normal distribution to obtain confidence intervals
       }
       else{
 
         pred = pred + rep(beta, nrow(newdata))
-        # conf = conf + rep(beta, nrow(newdata))  + rnorm(1,0, sqrt(object$sigma2[[j]]))
       }
 
     }
 
     # re-scale the predictions
     preds[,i] = object$y_mean + object$y_sd*pred
-    # confs[,i] = object$y_mean + object$y_sd*conf
 
   }
 
-  return(list(predictions = preds#, confidence = confs
-              ))
+  return(list(predictions = preds))
 
 }

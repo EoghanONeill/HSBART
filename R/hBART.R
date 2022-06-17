@@ -144,27 +144,6 @@ hs_bart = function(x,
       #This function creates the phi-matrix based on the standardized data, ancestors object, the phi-function and the bandwidth
       # phi_matrix = phi_matrix(curr_trees[[j]],int, X_stand)
 
-      # phi_matrix = phi_matrix(curr_trees[[j]],int, X_stand)
-
-      # int_temp <- as.numeric(int)
-      # if(!is.matrix(int_temp)){
-      #   print("int_temp = ")
-      #   print(int_temp)
-      #
-      #   int_temp <- as.matrix(t(int_temp))
-      # }
-      # print("int = ")
-      # print(int)
-      #
-      #
-      # phi_matrix = phi_app_hs( as.matrix(as.numeric(curr_trees[[j]]$tree_matrix)) ,
-      #                          as.matrix(as.numeric(curr_trees[[j]]$node_indices))  ,
-      #                          as.matrix(int_temp) ,
-      #                          as.matrix(X_stand))
-
-
-
-
       int_temp <- int
       if(!is.matrix(int_temp)){
         # print("int_temp = ")
@@ -181,21 +160,21 @@ hs_bart = function(x,
 
       phi_matrix = suppressWarnings(
         phi_app_hs(matrix(as.numeric(curr_trees[[j]]$tree_matrix),
-                                       nrow = nrow(curr_trees[[j]]$tree_matrix),
-                                       ncol = ncol(curr_trees[[j]]$tree_matrix)) ,
-                                matrix(as.numeric(curr_trees[[j]]$node_indices),
-                                       nrow = length(curr_trees[[j]]$node_indices),
-                                       ncol = 1)  ,
-                                matrix(as.numeric(int_temp),
-                                       nrow = nrow(int_temp),
-                                       ncol = ncol(int_temp)) ,
-                                as.matrix(X_stand))
-        )
+                          nrow = nrow(curr_trees[[j]]$tree_matrix),
+                          ncol = ncol(curr_trees[[j]]$tree_matrix)) ,
+                   matrix(as.numeric(curr_trees[[j]]$node_indices),
+                          nrow = length(curr_trees[[j]]$node_indices),
+                          ncol = 1)  ,
+                   matrix(as.numeric(int_temp),
+                          nrow = nrow(int_temp),
+                          ncol = ncol(int_temp)) ,
+                   as.matrix(X_stand))
+      )
 
 
       #This function construct our design matrix based on the phi-matrix and the covariates that are included in the tree
       X = design_matrix(curr_trees[[j]], X_stand, phi_matrix,int)
-      }
+    }
 
       # Prior for the beta vector
       p = ncol(X)
@@ -228,21 +207,6 @@ hs_bart = function(x,
         #This function creates the phi-matrix based on the standardized data, ancestors object, the phi-function and the bandwidth
         # phi_matrix_new = phi_matrix(new_trees[[j]],int_new, X_stand)
 
-        # int_temp <- as.numeric(int_new)
-        #
-        # if(!is.matrix(int_new)){
-        #   print("int_new = ")
-        #   print(int_new)
-        #
-        #   int_temp <- as.matrix(t(int_new))
-        # }
-        # print("int_new = ")
-        # print(int_new)
-        #
-        # phi_matrix_new = phi_app_hs(as.matrix(as.numeric(new_trees[[j]]$tree_matrix)) ,
-        #                             as.matrix(as.numeric(new_trees[[j]]$node_indices) ) ,
-        #                             as.matrix(int_temp ),
-        #                             as.matrix(X_stand))
 
 
         int_temp <- int_new
@@ -260,16 +224,16 @@ hs_bart = function(x,
 
         phi_matrix_new = suppressWarnings(
           phi_app_hs(matrix(as.numeric(new_trees[[j]]$tree_matrix),
-                                       nrow = nrow(new_trees[[j]]$tree_matrix),
-                                       ncol = ncol(new_trees[[j]]$tree_matrix)) ,
-                                matrix(as.numeric(new_trees[[j]]$node_indices),
-                                       nrow = length(new_trees[[j]]$node_indices),
-                                       ncol = 1)  ,
-                                matrix(as.numeric(int_temp),
-                                       nrow = nrow(int_temp),
-                                       ncol = ncol(int_temp)) ,
-                                as.matrix(X_stand))
-        )
+                            nrow = nrow(new_trees[[j]]$tree_matrix),
+                            ncol = ncol(new_trees[[j]]$tree_matrix)) ,
+                     matrix(as.numeric(new_trees[[j]]$node_indices),
+                            nrow = length(new_trees[[j]]$node_indices),
+                            ncol = 1)  ,
+                     matrix(as.numeric(int_temp),
+                            nrow = nrow(int_temp),
+                            ncol = ncol(int_temp)) ,
+                     as.matrix(X_stand))
+          )
 
 
         #This function construct our design matrix based on the phi-matrix and the covariates that are included in the tree
@@ -301,7 +265,7 @@ hs_bart = function(x,
       a = alpha_mh(l_new,l_old, curr_trees[[j]],new_trees[[j]], type)
 
 
-      if(min(1,a) > runif(1)) { # In case the alpha is bigger than a uniformly sampled value between zero and one
+      if(a > runif(1)) { # In case the alpha is bigger than a uniformly sampled value between zero and one
 
         curr_trees[[j]] = new_trees[[j]] # The current tree "becomes" the new tree, if the latter is better
 
