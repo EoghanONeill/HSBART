@@ -38,9 +38,9 @@ hs_bart = function(x,
   # The original X-matrix is stored as X_orig, this will be useful for the covariate sampling
   X_orig = x
 
-  X = as.matrix(cbind(1,scale(x, center, scale))) # standardising the covariates and adding an intercept
+  X = as.matrix(cbind(1,scale(x, center = center, scale = scale))) # standardising the covariates and adding an intercept
 
-  # The standardized X-matrix is stored as X_stand, whis will be useful for the tree modifications and design matrix construction
+  # The standardized X-matrix is stored as X_stand, this will be useful for the tree modifications and design matrix construction
   X_stand = X
 
   # Extract control parameters
