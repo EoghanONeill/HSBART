@@ -76,7 +76,10 @@ phi_matrix = function(mtree,int, x){
   if(!is.matrix(int)){
     phi_matrix = matrix(NA,n,1)
     for(i in 1:n){
-      phi_matrix[i,1] = ( int['n_right']*sum(ifelse(is.element(parent_list(mtree,i),int['child_left']),1,0)) + int['n_left']*sum(ifelse(is.element(parent_list(mtree,i),int['child_right']),1,0)) )/ sqrt(int['n_left']*int['n_right'])
+      phi_matrix[i,1] = ( int['n_right']*
+                            sum(ifelse(is.element(parent_list(mtree,i),int['child_left']),1,0)) -
+                            int['n_left']*
+                            sum(ifelse(is.element(parent_list(mtree,i),int['child_right']),1,0)) )/ sqrt(int['n_left']*int['n_right'])
     }
   }
   else{
@@ -84,7 +87,10 @@ phi_matrix = function(mtree,int, x){
     for(j in 1:nrow(int)){
       for(i in 1:n){
 
-        phi_matrix[i,j] = (int[j,'n_right']*sum(ifelse(is.element(parent_list(mtree,i),int[j,'child_left']),1,0)) + int[j,'n_left']*sum(ifelse(is.element(parent_list(mtree,i),int[j,'child_right']),1,0)) )/ sqrt(int[j,'n_left']*int[j,'n_right'])
+        phi_matrix[i,j] = (int[j,'n_right']*
+                             sum(ifelse(is.element(parent_list(mtree,i),int[j,'child_left']),1,0))-
+                             int[j,'n_left']*
+                             sum(ifelse(is.element(parent_list(mtree,i),int[j,'child_right']),1,0)) )/ sqrt(int[j,'n_left']*int[j,'n_right'])
 
       }
     }
@@ -129,8 +135,10 @@ phi_matrix_test = function(mtree,int, x){
   if(!is.matrix(int)){
     phi_matrix = matrix(NA,n,1)
     for(i in 1:n){
-      phi_matrix[i,1] = ( int['n_right']*sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int['child_left']),1,0)) +
-                            int['n_left']*sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int['child_right']),1,0)) )/ sqrt(int['n_left']*int['n_right'])
+      phi_matrix[i,1] = ( int['n_right']*
+                            sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int['child_left']),1,0)) -
+                            int['n_left']*
+                            sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int['child_right']),1,0)) )/ sqrt(int['n_left']*int['n_right'])
     }
   }
   else{
@@ -138,8 +146,10 @@ phi_matrix_test = function(mtree,int, x){
     for(j in 1:nrow(int)){
       for(i in 1:n){
 
-        phi_matrix[i,j] = (int[j,'n_right']*sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int[j,'child_left']),1,0)) +
-                             int[j,'n_left']*sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int[j,'child_right']),1,0)) )/ sqrt(int[j,'n_left']*int[j,'n_right'])
+        phi_matrix[i,j] = (int[j,'n_right']*
+                             sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int[j,'child_left']),1,0)) -
+                             int[j,'n_left']*
+                             sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int[j,'child_right']),1,0)) )/ sqrt(int[j,'n_left']*int[j,'n_right'])
 
       }
     }
@@ -246,6 +256,34 @@ design_matrix = function(mtree,x, phi_matrix, int){
     }
 
   }
+  return(design)
+}
+
+# The design matrix function takes the element wise products of the relevant covariates in the terminal node and the phi-matrix
+# The design matrix function constructs the design matrix based on the phi matrix and the variables involved in each terminal, input: tree, data, phi matrix and information about the internals
+design_matrix2 = function(mtree,x, phi_matrix, int){
+
+  # design = matrix(1,nrow(x),1)*phi_matrix[,1]
+  n = nrow(x)
+  design = matrix(NA,n,0) # initialize an empty design matrix
+
+  if(is.matrix(int)){
+
+    for(j in 1:nrow(int)){
+      new_design = x[,variable_list(mtree,int[j,'internal'])]*phi_matrix[,j]
+      design = cbind(design,new_design)
+    }
+
+  }
+
+  which_terminal = which(mtree$tree_matrix[,'terminal'] == 1)
+  for(j in 1:length(which_terminal)){ # loop over each terminal node
+
+    new_design = x[,variable_list(mtree,which_terminal[j])]*phi_matrix[,j] # perform an element wise multiplication of the columns of the leaf variables and the leaf probabilities
+    design = cbind(design,new_design)
+  }
+
+
   return(design)
 }
 
