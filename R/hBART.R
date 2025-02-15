@@ -1,4 +1,5 @@
 #' @import Rcpp
+#' @import SoftBart
 #' @importFrom mvtnorm 'rmvnorm'
 #' @importFrom stats 'rgamma' 'runif' 'dnorm' 'sd' 'rnorm' 'pnorm'
 #' @importFrom MCMCpack 'rdirichlet'
